@@ -74,7 +74,7 @@ func main() {
 }
 
 func readConf() string {
-	f, _ := os.Open("tsh_conf.txt")
+	f, _ := os.Open("conf.txt")
 	fileScanner := bufio.NewScanner(f)
 
 	tsh_conf := ""
