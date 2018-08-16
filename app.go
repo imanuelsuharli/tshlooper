@@ -40,9 +40,10 @@ func init() {
 
 func main() {
 	// Get ARGS
-	var tshFlag, cmd string
+	var tshFlag, cmd, dc string
 	flag.StringVar(&tshFlag, "s", "", "flag for service name")
 	flag.StringVar(&cmd, "c", "", "flag for command")
+	flag.StringVar(&dc, "dc", "", "flag for datacenter")
 	flag.Parse()
 
 	// Validate
@@ -52,9 +53,11 @@ func main() {
 	} else if cmd == "" {
 		log.Println("Please define -c=[COMMAND]")
 		return
+	} else if dc == "" {
+		log.Println("Please define -d=[DATACENTER]")
 	}
 
-	servSlice := lsTsh(tshFlag)
+	servSlice := lsTsh(tshFlag, dc)
 	var wg sync.WaitGroup
 	for i, v := range servSlice {
 		wg.Add(1)
@@ -85,10 +88,10 @@ func readConf() string {
 	return tsh_conf
 }
 
-func lsTsh(servName string) []string {
-	cmd := "tsh --proxy=%s --user=%s ls | grep %s | awk '{print $1}'"
+func lsTsh(servName, dc string) []string {
+	cmd := "tsh --proxy=%s --user=%s ls | grep %s | grep %s |awk '{print $1}'"
 
-	x, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(cmd, proxy, username, servName)).Output()
+	x, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(cmd, proxy, username, servName, dc)).Output()
 	if err != nil {
 		log.Println("[lsTsh] Error Command for /bin/sh", string(x), err)
 	}
